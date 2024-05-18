@@ -1,13 +1,16 @@
-from flask import Flask, render_template,request
+from flask import Flask, render_template, request
 import pickle
 import numpy as np
+import os
 
-popular = pickle.load(open('pkl_files\popular.pkl','rb'))
-pivot = pickle.load(open('pkl_files\pivot.pkl','rb'))
-data_with_title = pickle.load(open('pkl_files\data_with_title.pkl','rb'))
-similarity_scores = pickle.load(open('pkl_files\similarity_scores.pkl','rb'))
+base_path = os.path.dirname(os.path.abspath(__file__))
+popular = pickle.load(open(os.path.join(base_path, 'pkl_files', 'popular.pkl'), 'rb'))
+pivot = pickle.load(open(os.path.join(base_path, 'pkl_files', 'pivot.pkl'), 'rb'))
+data_with_title = pickle.load(open(os.path.join(base_path, 'pkl_files', 'data_with_title.pkl'), 'rb'))
+similarity_scores = pickle.load(open(os.path.join(base_path, 'pkl_files', 'similarity_scores.pkl'), 'rb'))
 
 app = Flask(__name__)
+
 @app.route('/')
 def index():
     try:
@@ -18,7 +21,6 @@ def index():
     except Exception as e:
         return f"An error occurred while loading the index page: {e}"
 
-
 @app.route('/recommend')
 def recommend_ui():
     try:
@@ -26,7 +28,7 @@ def recommend_ui():
     except Exception as e:
         return f"An error occurred while loading the recommend page: {e}"
 
-@app.route('/recommend_movies',methods=['post'])
+@app.route('/recommend_movies', methods=['POST'])
 def recommend():
     try:
         user_input = request.form.get('user_input')
@@ -56,4 +58,4 @@ def recommend():
         return f"An error occurred while processing the recommendation: {e}"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
